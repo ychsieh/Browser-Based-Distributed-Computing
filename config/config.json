@@ -1,0 +1,14 @@
+{
+	"development":{
+		"port": 3000,
+		"FACEBOOK_APP_ID": "526358320760773",
+		"FACEBOOK_APP_SECRET": "3a5aff5b2bb1f30ecc6c7bae62cb548d",
+		"FACEBOOK_SCOPE": ["read_stream", "email", "publish_actions", "user_photos"]
+	},
+	"production":{
+		"port": 3000,
+		"FACEBOOK_APP_ID": "551035111606293",
+		"FACEBOOK_APP_SECRET": "0877918995b07757dfb2376a124e61d7",
+		"FACEBOOK_SCOPE": ["read_stream", "email", "publish_actions"]
+	}
+}

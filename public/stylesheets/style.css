@@ -1,0 +1,40 @@
+@import 'normalize.css';
+@import 'bootstrap/bootstrap.min.css';
+@import 'bootstrap/todc-bootstrap.css';
+@import 'fontawesome/css/font-awesome.css';
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+#page {
+  margin-top: 20px;
+}
+a {
+  color: #00b7ff;
+}
+#target-image {
+  width: 300px;
+}
+#start-search {
+  display: none;
+}
+#stop-search {
+  display: none;
+}
+#restart-search {
+  display: none;
+}
+#photo-rank {
+  display: none;
+}
+#rank-alert {
+  display: none;
+}
+#result-image {
+  width: 300px;
+}
+.photos-info {
+  margin-top: 20px;
+}
+.mapper-info {
+  margin-top: 20px;
+}

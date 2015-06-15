@@ -1,0 +1,77 @@
+<html>
+	<div class="quotetest" style="font-size:24px; font-weight:bold;">&nbsp;&nbsp;&nbsp;&nbsp;Face Detection</div>
+	<canvas id="image" width="400" height="400"></canvas>
+
+	<script type="text/javascript" src="/ccv-unstable/js/ccv.js"></script>
+	<script type="text/javascript" src="/ccv-unstable/js/face.js"></script>
+	<script type="text/javascript">
+		var img3 = "http://imgcache.chinayes.com/cnews/20120120/201201201935026158395.jpg";
+		var img3 = "/images/kuo.jpg";
+		var img1 = "https://fbcdn-sphotos-g-a.akamaihd.net/hphotos-ak-prn2/964088_510488385667705_1466758710_o.jpg";
+		// var	img1 = "https://graph.facebook.com/100000251130296/picture?type=large";
+		var img2 = "http://www.5ha.net/uploads/allimg/130509/3_130509170908_1.jpg";
+		var async = false;
+
+		function getImageDim(image) {
+			var result = {};
+			document.body.appendChild(image);
+			result['width'] = image.offsetWidth;
+			result['height'] = image.offsetHeight;
+			document.body.removeChild(image);
+			return result;
+		}
+
+		function detectNewImage(src, async) {
+			var image = new Image();
+			var canvas = document.getElementById("image");
+			var ctx = canvas.getContext("2d");
+			image.onload = function (){
+				/* load image, and draw it to canvas */
+				var dim = getImageDim(image);
+				var newWidth = dim.width, newHeight = dim.height;
+				var scale = 1;
+
+				canvas.width = newWidth;
+				canvas.style.width = newWidth.toString() + "px";
+				canvas.height = newHeight;
+				canvas.style.height = newHeight.toString() + "px";
+				ctx.drawImage(image, 0, 0, newWidth, newHeight);
+				function post(comp) {
+					// document.getElementById("num-faces").innerHTML = comp.length.toString();
+					// document.getElementById("detection-time").innerHTML = Math.round((new Date()).getTime() - elapsed_time).toString() + "ms";
+					ctx.lineWidth = 2;
+					ctx.strokeStyle = 'rgba(230,87,0,0.8)';
+					/* draw detected area */
+					for (var i = 0; i < comp.length; i++) {
+						ctx.beginPath();
+						ctx.arc((comp[i].x + comp[i].width * 0.5) * scale, (comp[i].y + comp[i].height * 0.5) * scale,
+								(comp[i].width + comp[i].height) * 0.25 * scale * 1.2, 0, Math.PI * 2);
+						ctx.stroke();
+					}
+				}
+
+				/* call main detect_objects function */
+				if (async) {
+					ccv.detect_objects({ "canvas" : ccv.grayscale(ccv.pre(image)),
+										 "cascade" : cascade,
+										 "interval" : 5,
+										 "min_neighbors" : 1,
+										 "async" : true,
+										 "worker" : 1 })(post);
+				} else {
+					var comp = ccv.detect_objects({ "canvas" : ccv.grayscale(ccv.pre(image)),
+													"cascade" : cascade,
+													"interval" : 5,
+													"min_neighbors" : 1 });
+					post(comp);
+				}
+			};
+			// image.crossOrigin = 'http://profile.ak.fbcdn.net/crossdomain.xml';
+			image.crossOrigin = '';
+			image.src = src;
+		}
+
+		detectNewImage(img1, async);
+
+	</script>
+</html>

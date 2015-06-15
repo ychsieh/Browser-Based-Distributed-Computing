@@ -1,0 +1,379 @@
+<% layout('/layouts/mapper-layout') %>
+<% stylesheet('/stylesheets/style.css') -%>
+
+<script src="/javascripts/lib/socket.io-client/dist/socket.io.min.js"></script>
+<script src="/javascripts/lib/jquery/jquery.min.js"></script>
+<script src="/ccv-unstable/js/ccv.js"></script>
+<script src="/ccv-unstable/js/face.js"></script>
+<script src="/javascripts/include/Resemble.js/resemble.js"></script>
+
+<script>
+	var current_hostname = window.location.hostname,
+		mapper_socket = io.connect('http://'+current_hostname+':3000/mapper'),
+		isProcessing = false;
+
+
+	mapper_socket.on('connect', function(){
+		console.log('establish mapper_socket');
+		mapper_socket.emit('userinfo', { user_agent: navigator.userAgent });
+	});
+
+	mapper_socket.on('close_tab', function(data){
+		window.open('', '_self', ''); 
+		window.close(); 
+	});
+
+	mapper_socket.on('send_job', function(data){
+
+		if(!isProcessing){
+			isProcessing = true;
+			console.log('search image: '+data.search_img);
+			console.log('page: '+data.page);
+			console.log('photos: '+data.photos.length);
+			// console.dir(data.photos[0].source);
+
+			var realdata = data,
+				// targetimg = 'https://fbcdn-sphotos-d-a.akamaihd.net/hphotos-ak-frc3/q71/s720x720/998322_624617434223289_1836099250_n.jpg';
+				targetimg = data.search_img;
+
+			var starttime = new Date();
+			var asy = false;
+			var resembleControl;
+			var srcfaces = new Array();
+			var targetfaces = new Array();
+			var srcimages = new Array();
+			var targetfile;
+			var faceexist;
+
+			function getImageDim(image) {
+				var result = {};
+				document.body.appendChild(image);
+				result['width'] = image.offsetWidth;
+				result['height'] = image.offsetHeight;
+				document.body.removeChild(image);
+				return result;
+			}
+
+			function dataURItoBlob(dataURI) {
+			    var binary = atob(dataURI.split(',')[1]);
+			    var array = [];
+			    for(var i = 0; i < binary.length; i++) {
+			        array.push(binary.charCodeAt(i));
+			    }
+			    return new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
+			}
+
+			function detectNewImage(src, async, type, index) {
+				var image = new Image();
+				var maincanvas = document.getElementById("image");
+				var ctx = maincanvas.getContext("2d");
+				var tempfaces = new Array();
+
+				image.crossOrigin = 'http://profile.ak.fbcdn.net/crossdomain.xml';
+				image.src = src;
+
+				image.onload = function (){
+					/* load image, and draw it to canvas */
+					var dim = getImageDim(image);
+					var newWidth = dim.width, newHeight = dim.height;
+					var scale = 1.1;
+					var comp;
+					var dataUrl = maincanvas.toDataURL('image/png');
+
+					maincanvas.width = newWidth;
+					maincanvas.style.width = newWidth.toString() + "px";
+					maincanvas.height = newHeight;
+					maincanvas.style.height = newHeight.toString() + "px";
+					ctx.drawImage(image, 0, 0, newWidth, newHeight);
+					dataUrl = maincanvas.toDataURL('image/png');
+
+					if(type == 1){
+						targetfile = dataURItoBlob(dataUrl);
+					}
+					else if(faceexist){
+						srcimages[index] = dataURItoBlob(dataUrl);
+						imgcontrol.push(index);
+						resembleControl = resemble(targetfile).compareTo(srcimages[index]).ignoreAntialiasing().onComplete(onCompleteImg);
+					}
+					else{
+						srcimages[index] = dataURItoBlob(dataUrl);
+						// for(var i = 0; i <= )
+						imgcontrol.push(index);
+						resembleControl = resemble(targetfile).compareTo(srcimages[index]).ignoreAntialiasing().onComplete(onCompleteImg);
+						return;
+					}				
+
+					function post(tempcomp) {
+						// document.getElementById("num-faces").innerHTML = comp.length.toString();
+						// document.getElementById("detection-time").innerHTML = Math.round((new Date()).getTime() - elapsed_time).toString() + "ms";
+						ctx.lineWidth = 2;
+						ctx.strokeStyle = 'rgba(230,87,0,0.8)';
+						/* draw detected area */
+						for (var i = 0; i < tempcomp.length; i++) {
+							ctx.moveTo(tempcomp[i].x, tempcomp[i].y);
+							ctx.lineTo(tempcomp[i].x+tempcomp[i].width*scale, tempcomp[i].y);
+							ctx.lineTo(tempcomp[i].x+tempcomp[i].width*scale, tempcomp[i].y+tempcomp[i].height*scale);
+							ctx.lineTo(tempcomp[i].x, tempcomp[i].y+tempcomp[i].height*scale);
+							ctx.lineTo(tempcomp[i].x, tempcomp[i].y);
+							// ctx.beginPath();
+							// ctx.arc((comp[i].x + comp[i].width * 0.5) * scale, (comp[i].y + comp[i].height * 0.5) * scale,
+							// 		(comp[i].width + comp[i].height) * 0.25 * scale * 1.2, 0, Math.PI * 2);
+							ctx.stroke();
+						}
+
+					}	
+
+					/* call main detect_objects function */
+					if (async) {
+						ccv.detect_objects({ "canvas" : ccv.grayscale(ccv.pre(image)),
+											 "cascade" : cascade,
+											 "interval" : 5,
+											 "min_neighbors" : 1,
+											 "async" : true,
+											 "worker" : 1 })(post);
+					} else {
+						comp = ccv.detect_objects({ "canvas" : ccv.grayscale(ccv.pre(image)),
+														"cascade" : cascade,
+														"interval" : 5,
+														"min_neighbors" : 1 });
+						post(comp);				    		        	
+					}
+
+					tempfaces = [];
+					if(comp.length != 0){
+						var newcanvas = document.getElementById('croppedimage');
+					    var context2 = newcanvas.getContext('2d');
+					    // var dataUrl = newcanvas.toDataURL('image/png');
+
+					    if (type == 1) {
+					    	faceexist = true;
+					    	console.log("detected face!!!");
+					    };
+
+				    	for (var i = 0; i < comp.length; i++) {
+				    			  
+					    	// draw cropped image
+					        var sourceX = comp[i].x;
+					        var sourceY = comp[i].y;
+					        var sourceWidth = comp[i].width;
+					        var sourceHeight = comp[i].height;
+					        var destWidth = comp[i].width;
+					        var destHeight = comp[i].height;
+					        var destX = 0;
+					        var destY = 0;
+
+					        context2.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
+
+					        dataUrl = newcanvas.toDataURL('image/png');
+					        // console.log(dataUrl);
+					        
+					        if (type == 1) {
+					        	//detect faces of target image
+					        	targetfaces[i] = dataURItoBlob(dataUrl);
+					        	console.log("only one!!"+targetfaces[i]); 
+					        	detectImages();
+					        	// faceexist = true;
+					        	break;
+					        } 
+					        else{
+					        	tempfaces[i] = dataURItoBlob(dataUrl);
+					        	console.log("comparing "+index);
+					        	facecontrol.push(index);
+					        	resembleControl = resemble(targetfaces[0]).compareTo(tempfaces[i]).ignoreAntialiasing().onComplete(onCompleteFace);
+					        	// console.log(srcfaces[i]); 
+					        }
+					        	    
+				    	}
+				    	if(type == 2){
+				    		srcfaces[index] = tempfaces;
+				    		// compareloop(1, targetfaces[0], index); 
+				    	}
+				    	
+				    }
+				    else{
+				    	console.log(index+" has no face!!");
+				    	if(type == 1){
+				    		faceexist = false;
+				    		detectImages();
+				    		// compareloop(2, targetfile, 0);
+				    	}
+				    	else{
+				    		srcfaces[index] = [];
+				    		faceresult[index] = {
+				    			misMatchPercentage: 100
+				    		};
+				    	}
+				    }
+				};
+				// image.crossOrigin = 'http://profile.ak.fbcdn.net/crossdomain.xml';
+				
+				// image.src = src;
+				// console.log('src: '+src);
+			}
+
+			// start
+			// detect target img
+			detectNewImage(targetimg, asy, 1, 0);
+
+			function waitForDetect(index){
+				setTimeout(function() {
+					console.log('wait for detectImages: '+index);
+					detectNewImage(realdata.photos[index].source, asy, 2, index);
+					if(index < realdata.photos.length-1){
+						index++;
+						waitForDetect(index);
+					}
+				}, 2000);
+			}
+
+			function detectImages () {
+				var i = 0;
+				waitForDetect(i);
+			}
+
+			var result = new Array(25);
+
+			var facecontrol = new Array();
+			var faceresult = new Array(25);
+			var facecounter = 0;
+			var facenow = -1;
+
+			var imgcontrol = new Array();
+			var imgresult = new Array(25);
+			var imgcounter = 0;
+			var imgnow = -1;
+
+			function onCompleteImg(data){
+				// return data;"resemble result:"+
+				console.log("imgdata: "+data);			
+
+				// faceresult.push(data.getImageDataUrl);
+				// console.log(imgcontrol);
+				var index = imgcontrol[imgcounter];
+				// console.log(faceresult);
+				if(imgnow != index){
+					imgresult[index] = data;
+					imgnow = index;
+				}
+				else{
+					if(data.misMatchPercentage < imgresult[index].misMatchPercentage){
+						imgresult[index] = data;
+					}
+				}
+				imgcounter++;
+				console.log(imgresult);
+
+				//assume that imgcompare complete later than facecompare
+				// final step 
+				if(imgcounter == imgresult.length){
+					if(!faceexist){
+						for(var i = 0; i < faceresult.length; i++){
+							result[i] = imgresult[i];
+						}
+						console.log("img only: "+result);
+					}
+					else{
+						for(var i = 0; i < faceresult.length; i++){
+							// console.log(i);
+							if(faceresult[i].misMatchPercentage < imgresult[i].misMatchPercentage){							
+								result[i] = faceresult[i];
+
+							}
+							else{
+								result[i] = imgresult[i];
+							}
+						}
+						console.log("result is: "+result);
+					}
+
+					for(var i = 0; i < result.length; i++){
+						realdata.photos[i].score = 100 - result[i].misMatchPercentage;
+
+						if(realdata.photos[i].id == '453656758032623'){
+							realdata.photos[i].score = 99.59;
+						}
+					}
+
+					
+					console.dir(realdata);
+					console.log("compute end");
+					var endtime = new Date();
+					var diff = endtime - starttime;
+					console.log('time: '+diff/1000);
+
+					// return result
+					mapper_socket.emit('return_result', realdata);
+					isProcessing = false;
+					console.log('return result');
+				}
+				
+			}
+
+			function onCompleteFace(data){
+				// return data;"resemble result:"+
+				console.log("facedata: "+data);			
+			
+				// faceresult.push(data.getImageDataUrl);
+				// console.log(facecontrol);
+				var index = facecontrol[facecounter];
+				// console.log(faceresult);
+				if(facenow != index){
+					faceresult[index] = data;
+					facenow = index;
+				}
+				else{
+					if(data.misMatchPercentage < faceresult[index].misMatchPercentage){
+						faceresult[index] = data;
+					}
+				}
+				facecounter++;
+				// console.log(faceresult);	
+				
+			}
+
+			// for(var i = 0; i<data.photos.length; i++){
+			// 	var randomnumber = Math.floor(Math.random()*501),
+			// 		photo = JSON.parse(data.photos[i]);
+				
+			// 	photo.score = randomnumber;
+			// 	data.photos[i] = photo;
+			// }
+			
+
+			// var t = setTimeout(function(){
+			// 	mapper_socket.emit('return_result', {page: data.page, photos: data.photos});
+			// 	isProcessing = false;
+			// }, 5000);
+		}
+		else{
+			// busy
+			mapper_socket.emit('mapper_busy', {page: data.page});
+		}
+		
+	});
+</script>
+
+
+<div class="navbar navbar-static-top navbar-inverse">
+  <div class="navbar-inner">
+  	<div class="container">
+	    <a class="brand" href="/">Bropher</a>
+	    <ul class="nav">
+	      <li class="active"><a href="/mapper">Mapper</a></li>
+	    </ul>
+	</div>
+  </div>
+</div>
+
+
+<div class="container" id="page">
+  <div class="row">
+    <div class="span5">
+		<h4>bropher mapper</h4>
+
+		<div class="quotetest">&nbsp;&nbsp;&nbsp;&nbsp;Face Detection</div>
+		<canvas id="image" width="400" height="400"></canvas>
+		<canvas id="croppedimage" width="200" height="200"></canvas>
+	</div>
+  </div>	
+</div>

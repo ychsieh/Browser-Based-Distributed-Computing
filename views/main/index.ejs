@@ -1,0 +1,76 @@
+<% layout('/layouts/main-layout') %>
+<% stylesheet('/stylesheets/style.css') -%>
+<% stylesheet('/stylesheets/dropzone/basic.css') -%>
+
+
+<div class="navbar navbar-static-top navbar-inverse">
+  <div class="navbar-inner">
+  	<div class="container">
+	    <a class="brand" href="/">Bropher</a>
+	    <ul class="nav">
+	      <li><a href="/mapper">Mapper</a></li>
+	    </ul>
+	</div>
+  </div>
+</div>
+
+
+<div class="container" id="page">
+  <div class="row">
+    <div class="span5">
+    	<% if(!user){ %>
+    	<!-- <legend> -->
+    		<a href="/auth/facebook" class="btn btn-primary">使用facebook帳號登入</a>
+    	<!-- </legend> -->
+    	<% } else { %>
+    		<div id="search-image">
+	    		<legend> Search image in the facebook. </legend>
+	    		<div id="photo-upload">
+		    		<div id="article-photo-upload">
+		    			<legend><h4>上傳照片 <small><i class="icon-picture"></i></small></h4></legend>
+		        		<form id="article-photo-dropzone" class="dropzone"></form>
+	        		</div>
+	        	</div>
+	        	<div id="target-image">
+	        	</div>
+	        	<button class="btn btn-primary" id="start-search">Start Search</button>
+	        	<button class="btn btn-danger" id="stop-search">End Search</button>
+	        	<button class="btn btn-warning pull-right" id="restart-search">Restart</button>
+        	</div>
+
+        	<div class="photos-info">
+        		<legend>Search photo status: </legend>
+        		<h5>Source pages: <span id="total-page">0</span></h5>
+        		<h5>Completed pages: <span id="completed-page">0</span></h5>
+        	</div>
+
+        	<div class="mapper-info">
+        		<table class="table table-striped">
+        			<legend>Mapper status</legend>
+        			<thead>
+					    <tr>
+					      <th>#</th>
+					      <th>Mapper sid</th>
+					      <th>Current</th>
+					      <th>Finish</th>
+					      <th>Status</th>
+					    </tr>
+					</thead>
+					<tbody id="mapper-tbody">
+					</tbody>
+        		</table>
+        	</div>
+    	<% } %>
+    </div>
+    <% if(user){ %>
+    <div class="span5 pull-right" id="photo-rank">
+    	<legend>Photo Rank  <p class="text-error pull-right" id="rank-alert">Rank Reloaded !</p></legend>
+    	<div id="rank-list">
+
+    	</div>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+

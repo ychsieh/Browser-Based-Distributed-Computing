@@ -1,0 +1,495 @@
+<html>
+	<div class="quotetest" style="font-size:24px; font-weight:bold;">&nbsp;&nbsp;&nbsp;&nbsp;Face Detection</div>
+	<canvas id="image" width="400" height="400"></canvas>
+	<canvas id="croppedimage" width="200" height="200"></canvas>
+
+	<script type="text/javascript" src="/javascripts/lib/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="/ccv-unstable/js/ccv.js"></script>
+	<script type="text/javascript" src="/ccv-unstable/js/face.js"></script>
+	<script type="text/javascript" src="/javascripts/include/Resemble.js/resemble.js"></script>
+	<script type="text/javascript">
+		var realdata = {
+photos: [
+{
+id: "508995529148420",
+from: {
+name: "Ting-Yun Ho",
+id: "100001139325038"
+},
+source: "https://fbcdn-sphotos-e-a.akamaihd.net/hphotos-ak-ash3/s720x720/1010250_508995529148420_1918317798_n.jpg"
+},
+{
+id: "625151160836583",
+from: {
+name: "郭瀚智",
+id: "100000251130296"
+},
+source: "https://fbcdn-sphotos-g-a.akamaihd.net/hphotos-ak-ash3/s720x720/5912_625151160836583_761655012_n.jpg"
+},
+{
+id: "4618870644299",
+from: {
+name: "吳庭瑜",
+id: "1668632478"
+},
+source: "https://fbcdn-sphotos-c-a.akamaihd.net/hphotos-ak-prn2/s720x720/988224_4618870644299_1484470679_n.jpg"
+},
+{
+id: "4618858844004",
+from: {
+name: "吳庭瑜",
+id: "1668632478"
+},
+source: "https://fbcdn-sphotos-g-a.akamaihd.net/hphotos-ak-prn2/s720x720/8443_4618858844004_1944258071_n.jpg"
+},
+{
+id: "10200700926578579",
+from: {
+name: "Victor Tsai",
+id: "1023791341"
+},
+source: "https://fbcdn-sphotos-g-a.akamaihd.net/hphotos-ak-ash4/s720x720/1005048_10200700926578579_671689115_n.jpg"
+},
+{
+id: "624650507553315",
+from: {
+name: "郭瀚智",
+id: "100000251130296"
+},
+source: "https://fbcdn-sphotos-f-a.akamaihd.net/hphotos-ak-frc3/s720x720/1000808_624650507553315_1063184279_n.jpg"
+},
+{
+id: "4897176637647",
+from: {
+name: "粘粘",
+id: "1544815978"
+},
+source: "https://fbcdn-sphotos-g-a.akamaihd.net/hphotos-ak-ash3/196485_4897176637647_1030372325_n.jpg"
+},
+{
+id: "4897174957605",
+from: {
+name: "粘粘",
+id: "1544815978"
+},
+source: "https://fbcdn-sphotos-b-a.akamaihd.net/hphotos-ak-ash3/7870_4897174957605_1472251969_n.jpg"
+},
+{
+id: "4897167437417",
+from: {
+name: "粘粘",
+id: "1544815978"
+},
+source: "https://fbcdn-sphotos-a-a.akamaihd.net/hphotos-ak-prn2/7263_4897167437417_1036893655_n.jpg"
+},
+{
+id: "4897167477418",
+from: {
+name: "粘粘",
+id: "1544815978"
+},
+source: "https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-ash4/484673_4897167477418_1850735001_n.jpg"
+},
+{
+id: "624392207573965",
+from: {
+name: "Michael Hsu",
+id: "100000095742820"
+},
+source: "https://fbcdn-sphotos-d-a.akamaihd.net/hphotos-ak-prn2/s720x720/5908_624392207573965_830539689_n.jpg"
+},
+{
+id: "624392140907305",
+from: {
+name: "Michael Hsu",
+id: "100000095742820"
+},
+source: "https://fbcdn-sphotos-d-a.akamaihd.net/hphotos-ak-ash4/s720x720/9371_624392140907305_685074440_n.jpg"
+},
+{
+id: "4599253193970",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-a-a.akamaihd.net/hphotos-ak-ash3/s720x720/484761_4599253193970_56143513_n.jpg"
+},
+{
+id: "4599252633956",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-g-a.akamaihd.net/hphotos-ak-prn1/s720x720/994147_4599252633956_2140429216_n.jpg"
+},
+{
+id: "4599251953939",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-f-a.akamaihd.net/hphotos-ak-prn1/s720x720/994275_4599251953939_1708051320_n.jpg"
+},
+{
+id: "4599251513928",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-d-a.akamaihd.net/hphotos-ak-frc3/s720x720/970566_4599251513928_1334002811_n.jpg"
+},
+{
+id: "4599251073917",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-b-a.akamaihd.net/hphotos-ak-ash3/s720x720/1010637_4599251073917_406205756_n.jpg"
+},
+{
+id: "4599250153894",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-ash3/s720x720/10600_4599250153894_2020499731_n.jpg"
+},
+{
+id: "4599249793885",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-e-a.akamaihd.net/hphotos-ak-ash3/s720x720/532526_4599249793885_1799850069_n.jpg"
+},
+{
+id: "4599249313873",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-c-a.akamaihd.net/hphotos-ak-prn1/s720x720/1011320_4599249313873_799275447_n.jpg"
+},
+{
+id: "4599248593855",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-d-a.akamaihd.net/hphotos-ak-prn1/s720x720/946492_4599248593855_361538940_n.jpg"
+},
+{
+id: "4599248353849",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-f-a.akamaihd.net/hphotos-ak-prn1/s720x720/1010428_4599248353849_1124467855_n.jpg"
+},
+{
+id: "4599247753834",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-prn1/s720x720/1010281_4599247753834_784724336_n.jpg"
+},
+{
+id: "4599246833811",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-b-a.akamaihd.net/hphotos-ak-ash4/s720x720/5349_4599246833811_647519320_n.jpg"
+},
+{
+id: "4599246753809",
+from: {
+name: "Eva Liao",
+id: "1671505094"
+},
+source: "https://fbcdn-sphotos-c-a.akamaihd.net/hphotos-ak-ash4/s720x720/1004582_4599246753809_981701859_n.jpg"
+}
+],
+search_img: "http://localhost:3000/uploads/photo/032443qnqqqbgdi0zkoicq.jpg",
+page: "1"
+};
+		var starttime = new Date();
+
+		var	targetimg = "https://fbcdn-sphotos-d-a.akamaihd.net/hphotos-ak-frc3/998322_624617434223289_1836099250_n.jpg";
+		var testarray = "http://140.112.106.188:3000/data/1";
+
+		var asy = false;
+		var resembleControl;
+		var srcfaces = new Array();
+		var targetfaces = new Array();
+		var srcimages = new Array();
+		var targetfile;
+		var faceexist;
+
+		function getImageDim(image) {
+			var result = {};
+			document.body.appendChild(image);
+			result['width'] = image.offsetWidth;
+			result['height'] = image.offsetHeight;
+			document.body.removeChild(image);
+			return result;
+		}
+
+		function dataURItoBlob(dataURI) {
+		    var binary = atob(dataURI.split(',')[1]);
+		    var array = [];
+		    for(var i = 0; i < binary.length; i++) {
+		        array.push(binary.charCodeAt(i));
+		    }
+		    return new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
+		}
+
+		function detectNewImage(src, async, type, index) {
+			var image = new Image();
+			var maincanvas = document.getElementById("image");
+			var ctx = maincanvas.getContext("2d");
+			var tempfaces = new Array();
+
+			image.onload = function (){
+				/* load image, and draw it to canvas */
+				var dim = getImageDim(image);
+				var newWidth = dim.width, newHeight = dim.height;
+				var scale = 1.1;
+				var comp;
+				var dataUrl = maincanvas.toDataURL('image/png');
+
+				maincanvas.width = newWidth;
+				maincanvas.style.width = newWidth.toString() + "px";
+				maincanvas.height = newHeight;
+				maincanvas.style.height = newHeight.toString() + "px";
+				ctx.drawImage(image, 0, 0, newWidth, newHeight);
+				dataUrl = maincanvas.toDataURL('image/png');
+
+				if(type == 1){
+					targetfile = dataURItoBlob(dataUrl);
+				}
+				else if(faceexist){
+					srcimages[index] = dataURItoBlob(dataUrl);
+					imgcontrol.push(index);
+					resembleControl = resemble(targetfile).compareTo(srcimages[index]).ignoreAntialiasing().onComplete(onCompleteImg);
+				}
+				else{
+					srcimages[index] = dataURItoBlob(dataUrl);
+					// for(var i = 0; i <= )
+					imgcontrol.push(index);
+					resembleControl = resemble(targetfile).compareTo(srcimages[index]).ignoreAntialiasing().onComplete(onCompleteImg);
+					return;
+				}				
+
+				function post(tempcomp) {
+					// document.getElementById("num-faces").innerHTML = comp.length.toString();
+					// document.getElementById("detection-time").innerHTML = Math.round((new Date()).getTime() - elapsed_time).toString() + "ms";
+					ctx.lineWidth = 2;
+					ctx.strokeStyle = 'rgba(230,87,0,0.8)';
+					/* draw detected area */
+					for (var i = 0; i < tempcomp.length; i++) {
+						ctx.moveTo(tempcomp[i].x, tempcomp[i].y);
+						ctx.lineTo(tempcomp[i].x+tempcomp[i].width*scale, tempcomp[i].y);
+						ctx.lineTo(tempcomp[i].x+tempcomp[i].width*scale, tempcomp[i].y+tempcomp[i].height*scale);
+						ctx.lineTo(tempcomp[i].x, tempcomp[i].y+tempcomp[i].height*scale);
+						ctx.lineTo(tempcomp[i].x, tempcomp[i].y);
+						// ctx.beginPath();
+						// ctx.arc((comp[i].x + comp[i].width * 0.5) * scale, (comp[i].y + comp[i].height * 0.5) * scale,
+						// 		(comp[i].width + comp[i].height) * 0.25 * scale * 1.2, 0, Math.PI * 2);
+						ctx.stroke();
+					}
+
+				}	
+
+				/* call main detect_objects function */
+				if (async) {
+					ccv.detect_objects({ "canvas" : ccv.grayscale(ccv.pre(image)),
+										 "cascade" : cascade,
+										 "interval" : 5,
+										 "min_neighbors" : 1,
+										 "async" : true,
+										 "worker" : 1 })(post);
+				} else {
+					comp = ccv.detect_objects({ "canvas" : ccv.grayscale(ccv.pre(image)),
+													"cascade" : cascade,
+													"interval" : 5,
+													"min_neighbors" : 1 });
+					post(comp);				    		        	
+				}
+
+				tempfaces = [];
+				if(comp.length != 0){
+					var newcanvas = document.getElementById('croppedimage');
+				    var context2 = newcanvas.getContext('2d');
+				    // var dataUrl = newcanvas.toDataURL('image/png');
+
+				    if (type == 1) {
+				    	faceexist = true;
+				    	console.log("detected face!!!");
+				    };
+
+			    	for (var i = 0; i < comp.length; i++) {
+			    			  
+				    	// draw cropped image
+				        var sourceX = comp[i].x;
+				        var sourceY = comp[i].y;
+				        var sourceWidth = comp[i].width;
+				        var sourceHeight = comp[i].height;
+				        var destWidth = comp[i].width;
+				        var destHeight = comp[i].height;
+				        var destX = 0;
+				        var destY = 0;
+
+				        context2.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
+
+				        dataUrl = newcanvas.toDataURL('image/png');
+				        // console.log(dataUrl);
+				        
+				        if (type == 1) {
+				        	//detect faces of target image
+				        	targetfaces[i] = dataURItoBlob(dataUrl);
+				        	console.log("only one!!"+targetfaces[i]); 
+				        	detectImages();
+				        	// faceexist = true;
+				        	break;
+				        } 
+				        else{
+				        	tempfaces[i] = dataURItoBlob(dataUrl);
+				        	console.log("comparing "+index);
+				        	facecontrol.push(index);
+				        	resembleControl = resemble(targetfaces[0]).compareTo(tempfaces[i]).ignoreAntialiasing().onComplete(onCompleteFace);
+				        	// console.log(srcfaces[i]); 
+				        }
+				        	    
+			    	}
+			    	if(type == 2){
+			    		srcfaces[index] = tempfaces;
+			    		// compareloop(1, targetfaces[0], index); 
+			    	}
+			    	
+			    }
+			    else{
+			    	console.log(index+" has no face!!");
+			    	if(type == 1){
+			    		faceexist = false;
+			    		detectImages();
+			    		// compareloop(2, targetfile, 0);
+			    	}
+			    	else{
+			    		srcfaces[index] = [];
+			    		faceresult[index] = {
+			    			misMatchPercentage: 100
+			    		};
+			    	}
+			    }
+			};
+			// image.crossOrigin = 'http://profile.ak.fbcdn.net/crossdomain.xml';
+			image.crossOrigin = '';
+			image.src = src;
+		}
+
+
+		// start
+		// detect target img
+		detectNewImage(targetimg, asy, 1, 0);
+
+		function detectImages () {
+			for(var i = 0; i < realdata.photos.length; i++){
+				detectNewImage(realdata.photos[i].source, asy, 2, i);
+				// break;
+			}
+
+		}
+
+		var result = new Array(25);
+
+		var facecontrol = new Array();
+		var faceresult = new Array(25);
+		var facecounter = 0;
+		var facenow = -1;
+
+		var imgcontrol = new Array();
+		var imgresult = new Array(25);
+		var imgcounter = 0;
+		var imgnow = -1;
+
+		function onCompleteImg(data){
+			// return data;"resemble result:"+
+			console.log("imgdata: "+data);			
+
+			// faceresult.push(data.getImageDataUrl);
+			// console.log(imgcontrol);
+			var index = imgcontrol[imgcounter];
+			// console.log(faceresult);
+			if(imgnow != index){
+				imgresult[index] = data;
+				imgnow = index;
+			}
+			else{
+				if(data.misMatchPercentage < imgresult[index].misMatchPercentage){
+					imgresult[index] = data;
+				}
+			}
+			imgcounter++;
+			console.log(imgresult);
+
+			//assume that imgcompare complete later than facecompare
+			if(imgcounter == imgresult.length){
+				if(!faceexist){
+					for(var i = 0; i < faceresult.length; i++){
+						result[i] = imgresult[i];
+					}
+					consol.log("img only: "+result);
+				}
+				else{
+					for(var i = 0; i < faceresult.length; i++){
+						// console.log(i);
+						if(faceresult[i].misMatchPercentage < imgresult[i].misMatchPercentage){							
+							result[i] = faceresult[i];
+
+						}
+						else{
+							result[i] = imgresult[i];
+						}
+					}
+					console.log("result is: "+result);
+				}
+
+				for(var i = 0; i < result.length; i++){
+					realdata.photos[i].score = 100 - result[i].misMatchPercentage;
+				}
+				console.dir(realdata);
+				console.log("compute end");
+				var endtime = new Date();
+				var diff = endtime - starttime;
+				console.log('time: '+diff/1000);
+			}
+			
+		}
+
+		function onCompleteFace(data){
+			// return data;"resemble result:"+
+			console.log("facedata: "+data);			
+		
+			// faceresult.push(data.getImageDataUrl);
+			// console.log(facecontrol);
+			var index = facecontrol[facecounter];
+			// console.log(faceresult);
+			if(facenow != index){
+				faceresult[index] = data;
+				facenow = index;
+			}
+			else{
+				if(data.misMatchPercentage < faceresult[index].misMatchPercentage){
+					faceresult[index] = data;
+				}
+			}
+			facecounter++;
+			// console.log(faceresult);	
+			
+		}
+		console.log("page load");
+
+	</script>
+</html>
